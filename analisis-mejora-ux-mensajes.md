@@ -31,6 +31,11 @@ El componente base para la mayoria de los mensajes es `fuse-alert`:
 - `src/@fuse/components/alert/alert.component.ts`
 - `src/@fuse/components/alert/alert.component.html`
 - `src/@fuse/components/alert/alert.component.scss`
+- `src/@fuse/components/alert/alert.component_v1.ts`
+- `src/@fuse/components/alert/alert.component_v1.html`
+- `src/@fuse/components/alert/alert.component_v1.scss`
+
+Nota importante: la exportacion publica actual de `fuse-alert` apunta a `alert.component_v1`, por lo que las pantallas actuales toman estilos desde `alert.component_v1.scss`.
 
 Actualmente `fuse-alert` ya centraliza estilos por:
 
@@ -146,6 +151,55 @@ Ejemplos de criterio:
 - Los `mat-error` ya estan cubiertos por la tarjeta anterior: existe `.fucsia-error-accent` en `src/styles/styles.scss`, con variables de Angular Material apuntando a `--fucsia-la`.
 - En adicionales, el mensaje "Lo sentimos..." ya esta modelado como `type: 'error'` en `src/app/modules/tarjeta-de-credito/pages/adicionales/adicionales.component.ts`, por lo que debe verse con el criterio de error fucsia.
 - Los mensajes informativos reales no deberian cambiar de estilo. La implementacion debe evitar un cambio global que convierta todo `info` en fucsia.
+
+## Implementacion realizada
+
+Se implemento la mejora respetando el criterio semantico del requerimiento:
+
+- Los mensajes `error` pasan a verse con fucsia institucional.
+- Los mensajes `info` reales se mantienen azules.
+- Los mensajes que estaban como `info`, pero comunicaban errores reales, fueron corregidos a `error`.
+- Los iconos de error no se modificaron, para no ampliar el alcance visual pedido.
+
+### Antes
+
+- `fuse-alert` mostraba los mensajes `type="error"` con paleta roja/warn propia de Fuse.
+- Algunos mensajes de error estaban declarados como `type="info"`, por lo que se veian azules aunque el texto indicaba error.
+- En la pagina principal, el mensaje "Ha ocurrido un error al obtener la informacion de sus prestamos" aparecia como informativo azul.
+- En tarjeta de credito, el mensaje "Ha ocurrido un error al obtener la informacion de tus tarjetas" aparecia como informativo azul.
+- En legales, las alertas de error para terminos y condiciones estaban declaradas como `info`.
+- En cuotas de prestamo, el mensaje "No pudimos obtener las cuotas..." aparecia como informativo azul.
+- En nuevo usuario, un `mat-error` de error de servicio forzaba `text-blue-800`.
+
+### Ahora
+
+- `fuse-alert-type-error` usa variables globales para aplicar fucsia en texto, icono, borde y fondo suave.
+- El estilo de error queda centralizado en `src/@fuse/components/alert/alert.component.scss`.
+- Los tokens visuales se definen en `src/styles/styles.scss`:
+  - `--gol-alert-error-text`
+  - `--gol-alert-error-border`
+  - `--gol-alert-error-bg`
+  - `--gol-alert-error-code-bg`
+- Los `info` reales siguen azules, por ejemplo mensajes de e-mail, celular, carga, estados vacios o confirmaciones no bloqueantes.
+- Los errores que estaban modelados como `info` ahora se declararon como `error`.
+- El `mat-error` de nuevo usuario ya no fuerza azul y toma el criterio fucsia existente para errores de formulario.
+
+### Archivos modificados
+
+- `src/styles/styles.scss`: se agregaron variables globales para alertas de error e info.
+- `src/@fuse/components/alert/alert.component.scss`: se agrego override central para `fuse-alert-type-error` con fucsia institucional.
+- `src/@fuse/components/alert/alert.component_v1.scss`: se agrego el mismo override porque es la version que actualmente exporta `public-api.ts` y la que usa el login.
+- `src/app/modules/home-page/components/prestamos-error/prestamos-error.component.html`: se cambio el alert de prestamos de `info` a `error`.
+- `src/app/modules/tarjeta-de-credito/components/carousel/carousel-tarjetas.component_v2.html`: se cambio el alert de tarjetas de `info` a `error`.
+- `src/app/modules/legal/interfaces.ts`: se cambiaron las alertas de error de terminos y condiciones de `info` a `error`.
+- `src/app/modules/prestamos/pages/detalle-prestamo/components/cuotas-historial/cuotas-historial.component.html`: se cambio el alert "No pudimos obtener las cuotas..." de `info` a `error`.
+- `src/app/modules/auth/components/nuevo-usuario/nuevo-usuario.component.html`: se quito `text-blue-800` de un `mat-error` usado como error de servicio.
+
+### Casos que se dejaron sin tocar
+
+- Mensajes `info` reales: "Chequea tu e-mail", "Chequea tu celular", "Descargando resumen", "No tenes ningun prestamo vigente", "No registra movimientos", entre otros.
+- Mensajes `warn` que funcionan como advertencia real, por ejemplo alertas de mora en prestamos.
+- Iconografia de error: se mantiene el icono actual de `fuse-alert`.
 
 ## Resumen
 
