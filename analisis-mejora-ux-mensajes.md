@@ -200,7 +200,3 @@ Se implemento la mejora respetando el criterio semantico del requerimiento:
 - Mensajes `info` reales: "Chequea tu e-mail", "Chequea tu celular", "Descargando resumen", "No tenes ningun prestamo vigente", "No registra movimientos", entre otros.
 - Mensajes `warn` que funcionan como advertencia real, por ejemplo alertas de mora en prestamos.
 - Iconografia de error: se mantiene el icono actual de `fuse-alert`.
-
-## Resumen
-
-La mejora conviene encararla desde el componente base `fuse-alert`, no como parches por pantalla. El cambio principal seria reemplazar el rojo actual de errores por fucsia institucional, dejar los informativos reales en azul y corregir los casos donde un error este modelado como `info` o `warn`. Luego se revisarian casos puntuales con estilos custom o configuraciones inconsistentes.
